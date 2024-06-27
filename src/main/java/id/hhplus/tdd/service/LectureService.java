@@ -34,7 +34,9 @@ public class LectureService {
 
     @Transactional
     public UserLecture registerUserToLecture(Long lectureId, Long userId) {
+        // LectureRepository에서 findById를 비관적 락 설정
 
+        // exception이 발생하였을 때 testController에서 catch?감지?하여 처리하는 방법이 궁금합니다.
         Lecture lecture = lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new IllegalArgumentException("Not exist lecture:" + lectureId));
         User user = userRepository.findById(userId)
