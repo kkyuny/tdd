@@ -129,7 +129,20 @@ public class LectureControllerTest {
 
     @Test
     void testRegisterUserToLectureNotExistUser() throws Exception {
+        /*
+            1주차 과제에서 유닛테스트 형식으로
+            Throwable exception = assertThrows(IllegalArgumentException.class, () -> {
+                pointService.usePoints(userId, amount);
+            });
+            assertEquals("User not found", exception.getMessage());
+            이러한 형식으로 exception.getMessage()를 통하여 test를 진행하였는데
 
+            컨트롤러에서
+            result.andExpect(status().isOk())
+                .andExpect(result1 -> assertEquals("Not exist user:100", result1.getResolvedException().getMessage()));
+            이러한 형식으로 exception을 잡아보니 service 코드에서 exception이 발생하고 테스트가 실패로 종료되는데
+            service에서 발생한 exception을 testController에서 getMessage()하여 처리 방법이 궁금합니다.
+         */
         // Given
         Long lectureId = lecture.getId();
         Long userId = 100L; // 없음
@@ -146,6 +159,9 @@ public class LectureControllerTest {
 
     @Test
     void testRegisterUserToLectureNotExistLecture() throws Exception {
+        /*
+            상동
+         */
         // Given
         Long lectureId = 100L; // 없음
         User user = users.get(0);
@@ -180,6 +196,19 @@ public class LectureControllerTest {
 
     @Test
     void testConcurrencyRegistration() throws Exception {
+        /*
+            사실 동시성 테스트를 위하여 설정방법 자체에 오류가 있을 수 있겠지만
+            의도는 다수의 유저가 동시에 동작을 수행하도록 해보았습니다.
+            그래서 0~29의 유저는 정상등록
+            30~39의 유저는 등록실패 후에
+
+            등록여부 히스토리를 조회해보았지만
+
+            30~39 유저의 히스토리 조회 시 테스트가 실패하였습니다.
+
+            문제점이 무엇인지 궁금합니다.
+         */
+
         // Given
         int numberOfThreads = 40;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
@@ -195,7 +224,7 @@ public class LectureControllerTest {
                             .param("userId", user.getId().toString())
                             .contentType(MediaType.APPLICATION_JSON));
 
-                    if (index < 31) {
+                    if (index < 30) {
                         result.andExpect(status().isOk())
                                 .andExpect(jsonPath("$.user.id").value(user.getId()))
                                 .andExpect(jsonPath("$.lecture.id").value(lecture.getId()))
